@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 //const recipes: RecipeItem[] = [];
@@ -17,7 +18,7 @@ export default function Home() {
                 <title>Eaterate</title>
             </Head>
             {!!user && <div>Welcome {user.name}</div>}
-            {!user && <a href="/api/auth/login">Login</a>}
+            {!user && <Link href="/api/auth/login">Login</Link>}
         </>
     );
 }
