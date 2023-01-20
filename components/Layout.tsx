@@ -1,8 +1,12 @@
 import { Grid, Icon, Menu, Segment, Sidebar } from "semantic-ui-react";
 import React, { useState } from "react";
 
+import Link from "next/link";
+import { useUser } from "@auth0/nextjs-auth0/client";
+
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+    const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+    const { user } = useUser();
     return (
         <Grid columns={1}>
             <Grid.Column style={{ paddingBottom: 0 }}>
@@ -12,7 +16,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     </Menu.Menu>
 
                     <Menu.Menu position="right">
-                        <Menu.Item content="Sign in" icon="sign in" link />
+                        {!user && <Menu.Item content="Sign in" icon="sign in" link as="a" href="/api/auth/login" />}
                     </Menu.Menu>
                 </Menu>
             </Grid.Column>
@@ -27,10 +31,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                         visible={sidebarOpen}
                         width="thin"
                     >
-                        <Menu.Item as="a">
+                        <Menu.Item as={Link} href="/">
                             <Icon name="home" />
-                            Home
+                            My Recipes
                         </Menu.Item>
+                        <Menu.Item as={Link} href="/recipe">
+                            <Icon name="plus circle" />
+                            New Recipe
+                        </Menu.Item>
+                        {!!user && <Menu.Item content="Sign out" icon="sign out" link as="a" href="/api/auth/logout" />}
                     </Sidebar>
 
                     <Sidebar.Pusher>

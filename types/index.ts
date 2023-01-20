@@ -28,6 +28,6 @@ export interface RecipeItem extends DynamoDbItem {
     SK: `RECIPE#${string}`;
     Type: RecipeItemType;
     title: string;
-    steps: string;
+    instructions: string;
     ingredients: RecipeItemIngredient[];
 }
