@@ -1,24 +1,24 @@
+import { Button } from "semantic-ui-react";
 import Head from "next/head";
 import Link from "next/link";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import RecipeList from "@/components/RecipeList";
 
-//const recipes: RecipeItem[] = [];
+const recipes = [
+    {
+        id: "1",
+        title: "Spaghetti Bolognese",
+        description: "A classic Italian dish with a rich, savory meat sauce and perfectly cooked pasta."
+    },
+    { id: "2", title: "Grilled Cheese", description: "Golden, crispy bread with gooey melted cheese inside, the perfect comfort food." }
+];
 
 export default function Home() {
-    const { user, error, isLoading } = useUser();
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
-    if (error) {
-        return <div>{error.message}</div>;
-    }
     return (
         <>
             <Head>
                 <title>Eaterate</title>
             </Head>
-            {!!user && <div>Welcome {user.name}</div>}
-            {!user && <Link href="/api/auth/login">Login</Link>}
+            <RecipeList recipes={recipes} />
         </>
     );
 }

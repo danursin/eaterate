@@ -5,7 +5,7 @@ import config from "@/config";
 
 const { region, accessKeyId, secretAccessKey } = config;
 
-const dynamodb = new DynamoDB({
+const client = new DynamoDB({
     region,
     credentials: {
         accessKeyId,
@@ -18,7 +18,7 @@ const translateConfig: TranslateConfig = {
         // Whether to automatically convert empty strings, blobs, and sets to `null`.
         convertEmptyValues: false, // false, by default.
         // Whether to remove undefined values while marshalling.
-        removeUndefinedValues: false, // false, by default.
+        removeUndefinedValues: true, // false, by default.
         // Whether to convert typeof object to map attribute.
         convertClassInstanceToMap: false // false, by default.
     },
@@ -28,5 +28,5 @@ const translateConfig: TranslateConfig = {
     }
 };
 
-const dynamodbClient = DynamoDBDocument.from(dynamodb, translateConfig);
-export default dynamodbClient;
+const dynamodb = DynamoDBDocument.from(client, translateConfig);
+export default dynamodb;

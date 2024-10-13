@@ -1,4 +1,6 @@
-export type ItemType = UserItemType | RecipeItemType;
+export type ItemType = UserItemType | RecipeItemType | IngredientItemType;
+
+export type MetadataItemType = "META";
 
 export interface DynamoDbItem {
     PK: string;
@@ -11,23 +13,27 @@ export interface DynamoDbItem {
 
 export type UserItemType = "USER";
 export interface UserItem extends DynamoDbItem {
-    PK: `USER#${string}`;
-    SK: `META`;
+    PK: `${UserItemType}#${string}`;
+    SK: MetadataItemType;
     Type: UserItemType;
-}
-
-export interface RecipeItemIngredient {
-    text: string;
-    amount?: string | undefined;
-    unit?: string | undefined;
 }
 
 export type RecipeItemType = "RECIPE";
 export interface RecipeItem extends DynamoDbItem {
-    PK: `USER#${string}`;
-    SK: `RECIPE#${string}`;
+    PK: `${UserItemType}#${string}`;
+    SK: `${RecipeItemType}#${string}`;
     Type: RecipeItemType;
     title: string;
     instructions: string;
-    ingredients: RecipeItemIngredient[];
+    ingredients: string[];
+}
+
+export type IngredientItemType = "INGREDIENT";
+export interface IngredientItem extends DynamoDbItem {
+    PK: IngredientItemType;
+    /** The name of the ingredient, uppercased */
+    SK: Uppercase<string>;
+    Type: IngredientItemType;
+    /** The original casing of the ingredient */
+    name: string;
 }

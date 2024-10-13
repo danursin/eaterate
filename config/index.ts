@@ -7,10 +7,12 @@ export default {
     secretAccessKey,
     accessKeyId,
     region,
-    tableName
+    tableName,
+    userID: "12345"
 } as {
     secretAccessKey: string;
     accessKeyId: string;
     region: string;
     tableName: string;
+    userID: string;
 };
