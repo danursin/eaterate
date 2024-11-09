@@ -2,9 +2,10 @@ import { Image, List, Placeholder } from "semantic-ui-react";
 
 import Link from "next/link";
 import React from "react";
+import { RecipeItem } from "@/types";
 
 interface RecipeListProps {
-    recipes?: { title: string; description: string; id: string }[];
+    recipes?: RecipeItem[];
 }
 
 const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
@@ -13,7 +14,7 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
             {recipes && recipes.length > 0 ? (
                 <List divided relaxed>
                     {recipes.map((recipe) => (
-                        <List.Item key={recipe.id} as={Link} href={`/recipe/${recipe.id}`}>
+                        <List.Item key={recipe.SK} as={Link} href={`/recipe/${encodeURIComponent(recipe.SK)}`}>
                             <Image
                                 src="https://picsum.photos/200" // Placeholder image for now
                                 size="small"
@@ -21,7 +22,6 @@ const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
                             />
                             <List.Content>
                                 <List.Header>{recipe.title}</List.Header>
-                                <List.Description>{recipe.description}</List.Description>
                             </List.Content>
                         </List.Item>
                     ))}

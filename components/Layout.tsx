@@ -35,7 +35,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                                 <Icon name="home" />
                                 My Recipes
                             </Menu.Item>
-                            <Menu.Item as={Link} href="/recipe">
+                            <Menu.Item as={Link} href="/recipe/create">
                                 <Icon name="plus circle" />
                                 New Recipe
                             </Menu.Item>

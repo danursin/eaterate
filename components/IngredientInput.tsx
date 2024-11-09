@@ -14,10 +14,6 @@ const IngredientInput: React.FC<IngredientInputProps> = ({ value, onChange }) =>
     const { searchIngredients } = useIngredients();
     const [ingredients, setIngredients] = useState<IngredientItem[]>([]);
 
-    useEffect(() => {
-        onChange(localValue);
-    }, [localValue, onChange]);
-
     const handleSearchChange = useCallback(
         async (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownOnSearchChangeData) => {
             const { value } = data;

@@ -1,6 +1,7 @@
-import { Button } from "semantic-ui-react";
+import { Suspense, useEffect, useState } from "react";
+
 import Head from "next/head";
-import Link from "next/link";
+import { RecipeItem } from "@/types";
 import RecipeList from "@/components/RecipeList";
 
 const recipes = [
@@ -13,12 +14,23 @@ const recipes = [
 ];
 
 export default function Home() {
+    const [recipes, setRecipes] = useState<RecipeItem[]>();
+    useEffect(() => {
+        (async () => {
+            const response = await fetch("/api/recipe");
+            if (response.ok) {
+                const json = (await response.json()) as RecipeItem[];
+                setRecipes(json);
+            }
+        })();
+    }, []);
+
     return (
         <>
             <Head>
                 <title>Eaterate</title>
             </Head>
-            <RecipeList recipes={recipes} />
+            {recipes ? <RecipeList recipes={recipes} /> : <div>Loading...</div>}
         </>
     );
 }
