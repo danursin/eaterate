@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, Header, List, Loader } from "semantic-ui-react";
+import { Button, Container, Header, List, Loader } from "semantic-ui-react";
 import { useEffect, useState } from "react";
 
 import Link from "next/link";
@@ -31,6 +31,9 @@ const HomePage = () => {
     return (
         <Container>
             <Header as="h1">Recipe List</Header>
+            <Link href="/recipe/new" passHref>
+                <Button primary>Create New Recipe</Button>
+            </Link>
             {loading ? (
                 <Loader active inline="centered">
                     Loading Recipes...

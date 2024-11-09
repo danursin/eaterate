@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { RecipeItem } from "@/types";
+import { v4 as uuidv4 } from "uuid";
 
 const recipes: RecipeItem[] = [
     {
@@ -31,4 +32,20 @@ const recipes: RecipeItem[] = [
 
 export async function GET(_request: NextRequest) {
     return NextResponse.json(recipes);
+}
+
+export async function POST(request: NextRequest) {
+    const { title, instructions, ingredients } = await request.json();
+    
+    const newRecipe: RecipeItem = {
+        PK: `USER#12345`,
+        SK: `RECIPE#${uuidv4()}`,
+        Type: "RECIPE",
+        title,
+        instructions,
+        ingredients,
+    };
+
+    recipes.push(newRecipe);  // Add the new recipe to in-memory storage
+    return NextResponse.json(newRecipe, { status: 201 });
 }
