@@ -30,12 +30,12 @@ const recipes: RecipeItem[] = [
     }
 ];
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
     return NextResponse.json(recipes);
 }
 
 export async function POST(request: NextRequest) {
-    const { title, instructions, ingredients } = await request.json();
+    const { title, instructions, ingredients } = await request.json() as Pick<RecipeItem, "title" | "instructions" | "ingredients">;
     
     const newRecipe: RecipeItem = {
         PK: `USER#12345`,
