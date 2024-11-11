@@ -1,8 +1,7 @@
 // src/app/api/recipe/[id]/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-
-import { RecipeItem } from "@/types";
+import { RecipeItem, RouteContext } from "@/types";
 
 const recipes: RecipeItem[] = [
     {
@@ -31,9 +30,10 @@ const recipes: RecipeItem[] = [
     }
 ];
 
-export async function GET(request: NextRequest) {
-    const id = request.nextUrl.searchParams.get("id");
+export async function GET(request: NextRequest, context: RouteContext<{ id: string }>): Promise<NextResponse> {
+    const id = (await context.params).id;
     const recipeId: RecipeItem["SK"] = `RECIPE#${id}`;
+
     const recipe = recipes.find((r) => r.SK === recipeId);
 
     if (!recipe) {

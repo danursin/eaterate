@@ -37,3 +37,7 @@ export interface IngredientItem extends DynamoDbItem {
     /** The original casing of the ingredient */
     name: string;
 }
+
+export type RouteContext<T extends Record<string, string>> = {
+    params: Promise<T>;
+};
