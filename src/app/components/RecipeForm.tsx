@@ -46,18 +46,20 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ onSubmit, initialData }) => {
             />
 
             {ingredients.map((ingredient, index) => (
-                <Form.Group key={index} widths="equal">
+                <Form.Group key={index}>
                     <Form.Input
                         placeholder="Ingredient"
+                        width={14}
                         value={ingredient}
                         onChange={(_, { value }) => handleIngredientChange(index, value)}
                         style={{ flex: 1 }}
-                    />
-                    <Button
-                        icon="minus"
-                        color="red"
-                        onClick={() => handleRemoveIngredient(index)}
-                        style={{ alignSelf: "center", marginLeft: "8px" }}
+                        action={{
+                            color: "red",
+                            icon: "minus",
+                            basic: true,
+                            type: "button",
+                            onClick: () => handleRemoveIngredient(index)
+                        }}
                     />
                 </Form.Group>
             ))}
