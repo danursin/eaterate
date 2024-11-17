@@ -1,51 +1,52 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import dynamodb, { TABLE_NAME } from "@/db/dynamodb";
 
-import { RecipeItem } from "@/types";
+import config from "@/config";
 import { v4 as uuidv4 } from "uuid";
 
-const recipes: RecipeItem[] = [
-    {
-        PK: `USER#12345`, // Example user ID
-        SK: `RECIPE#1`,
-        Type: "RECIPE",
-        title: "Spaghetti Bolognese",
-        instructions: "A classic Italian pasta dish with a rich tomato sauce.",
-        ingredients: ["Spaghetti", "Ground Beef", "Tomato Sauce", "Garlic"]
-    },
-    {
-        PK: `USER#12345`,
-        SK: `RECIPE#2`,
-        Type: "RECIPE",
-        title: "Chicken Curry",
-        instructions: "A flavorful chicken curry with spices and coconut milk.",
-        ingredients: ["Chicken", "Curry Powder", "Coconut Milk", "Onions"]
-    },
-    {
-        PK: `USER#12345`,
-        SK: `RECIPE#3`,
-        Type: "RECIPE",
-        title: "Chocolate Cake",
-        instructions: "A rich and moist chocolate cake perfect for dessert.",
-        ingredients: ["Flour", "Cocoa Powder", "Eggs", "Butter"]
-    }
-];
-
 export async function GET() {
-    return NextResponse.json(recipes);
+    try {
+        const result = await dynamodb.send(new QueryCommand({
+            TableName: TABLE_NAME,
+            KeyConditionExpression: "PK = :PK AND begins_with(SK, :recipeType)",
+            ExpressionAttributeValues: {
+                ":PK": `USER#${config.userID}`,
+                ":recipeType": "RECIPE"
+            }
+        }));
+
+        return NextResponse.json(result.Items || []);
+    } catch (error) {
+        console.error("Error retrieving recipe list:", error);
+        return NextResponse.json({ message: "Failed to fetch recipes" }, { status: 500 });
+    }
 }
 
 export async function POST(request: NextRequest) {
-    const { title, instructions, ingredients } = await request.json() as Pick<RecipeItem, "title" | "instructions" | "ingredients">;
-    
-    const newRecipe: RecipeItem = {
-        PK: `USER#12345`,
-        SK: `RECIPE#${uuidv4()}`,
+    const { title, instructions, ingredients } = await request.json();
+    const recipeId = uuidv4(); 
+
+    const newRecipe = {
+        PK: `USER#${config.userID}`,
+        SK: `RECIPE#${recipeId}`,
         Type: "RECIPE",
         title,
         instructions,
-        ingredients,
+        ingredients
     };
 
-    recipes.push(newRecipe);  // Add the new recipe to in-memory storage
-    return NextResponse.json(newRecipe, { status: 201 });
+    try {
+        const command = new PutCommand({
+            TableName: TABLE_NAME,
+            Item: newRecipe
+        });
+
+        await dynamodb.send(command);
+
+        return NextResponse.json(newRecipe, { status: 201 });
+    } catch (error) {
+        console.error("Error creating recipe:", error);
+        return NextResponse.json({ message: "Failed to create recipe" }, { status: 500 });
+    }
 }

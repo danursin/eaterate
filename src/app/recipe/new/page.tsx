@@ -20,7 +20,7 @@ const CreateRecipePage = () => {
         });
 
         if (res.ok) {
-            router.push("/"); // Redirect to home page after successful creation
+            router.push("/");
         } else {
             console.error("Failed to create recipe");
         }

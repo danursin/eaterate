@@ -1,4 +1,3 @@
-// src/components/RecipeForm.tsx
 "use client";
 
 import { Button, Form } from "semantic-ui-react";
@@ -22,13 +21,17 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ onSubmit, initialData }) => {
         setIngredients(updatedIngredients);
     };
 
-    const handleAddIngredient = () => setIngredients([...ingredients, ""]);
+    const handleAddIngredient = () => {
+        setIngredients([...ingredients, ""]);
+    };
+
     const handleRemoveIngredient = (index: number) => {
-        setIngredients(ingredients.filter((_, i) => i !== index));
+        const updatedIngredients = ingredients.filter((_, i) => i !== index);
+        setIngredients(updatedIngredients);
     };
 
     const handleSubmit = () => {
-        onSubmit({ title, instructions, ingredients });
+        onSubmit({ title, instructions, ingredients: ingredients.filter(Boolean) });
     };
 
     return (
@@ -41,21 +44,25 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ onSubmit, initialData }) => {
                 onChange={(_, { value }) => setInstructions(value as string)}
                 required
             />
-            <Form.Field label="Ingredients">
-                {ingredients.map((ingredient, index) => (
-                    <div key={index} style={{ display: "flex", marginBottom: "8px" }}>
-                        <Form.Input
-                            placeholder="Ingredient"
-                            value={ingredient}
-                            onChange={(_, { value }) => handleIngredientChange(index, value)}
-                            style={{ flex: 1, marginRight: "8px" }}
-                        />
-                        <Button icon="minus" color="red" onClick={() => handleRemoveIngredient(index)} />
-                    </div>
-                ))}
-                <Button type="button" onClick={handleAddIngredient} color="green" icon="plus" content="Add Ingredient" />
-            </Form.Field>
-            <Button type="submit" primary>
+
+            {ingredients.map((ingredient, index) => (
+                <Form.Group key={index} widths="equal">
+                    <Form.Input
+                        placeholder="Ingredient"
+                        value={ingredient}
+                        onChange={(_, { value }) => handleIngredientChange(index, value)}
+                        style={{ flex: 1 }}
+                    />
+                    <Button
+                        icon="minus"
+                        color="red"
+                        onClick={() => handleRemoveIngredient(index)}
+                        style={{ alignSelf: "center", marginLeft: "8px" }}
+                    />
+                </Form.Group>
+            ))}
+            <Button type="button" onClick={handleAddIngredient} color="green" icon="plus" content="Add Ingredient" />
+            <Button type="submit" primary fluid>
                 Submit
             </Button>
         </Form>

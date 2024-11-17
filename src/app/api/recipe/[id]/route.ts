@@ -1,44 +1,74 @@
-// src/app/api/recipe/[id]/route.ts
-
+import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { NextRequest, NextResponse } from "next/server";
-import { RecipeItem, RouteContext } from "@/types";
+import dynamodb, { TABLE_NAME } from "@/db/dynamodb";
 
-const recipes: RecipeItem[] = [
-    {
-        PK: `USER#12345`, // Example user ID
-        SK: `RECIPE#1`,
-        Type: "RECIPE",
-        title: "Spaghetti Bolognese",
-        instructions: "A classic Italian pasta dish with a rich tomato sauce.",
-        ingredients: ["Spaghetti", "Ground Beef", "Tomato Sauce", "Garlic"]
-    },
-    {
-        PK: `USER#12345`,
-        SK: `RECIPE#2`,
-        Type: "RECIPE",
-        title: "Chicken Curry",
-        instructions: "A flavorful chicken curry with spices and coconut milk.",
-        ingredients: ["Chicken", "Curry Powder", "Coconut Milk", "Onions"]
-    },
-    {
-        PK: `USER#12345`,
-        SK: `RECIPE#3`,
-        Type: "RECIPE",
-        title: "Chocolate Cake",
-        instructions: "A rich and moist chocolate cake perfect for dessert.",
-        ingredients: ["Flour", "Cocoa Powder", "Eggs", "Butter"]
+import { RouteContext } from "@/types";
+import config from "@/config";
+
+// GET request to retrieve a recipe by ID
+export async function GET(
+    request: NextRequest,
+    context: RouteContext<{ id: string }>
+) {
+    const params = await context.params; // Await the params due to Promise typing
+    const recipeId = `RECIPE#${params.id}`; // Construct the SK using the recipe ID
+
+    try {
+        const command = new GetCommand({
+            TableName: TABLE_NAME,
+            Key: {
+                PK: `USER#${config.userID}`, // Assuming a static user ID; adjust as needed
+                SK: recipeId
+            }
+        });
+
+        const result = await dynamodb.send(command);
+
+        if (!result.Item) {
+            return NextResponse.json({ message: "Recipe not found" }, { status: 404 });
+        }
+
+        return NextResponse.json(result.Item);
+    } catch (error) {
+        console.error("Error retrieving recipe:", error);
+        return NextResponse.json({ message: "Failed to fetch recipe" }, { status: 500 });
     }
-];
+}
 
-export async function GET(request: NextRequest, context: RouteContext<{ id: string }>): Promise<NextResponse> {
-    const id = (await context.params).id;
-    const recipeId: RecipeItem["SK"] = `RECIPE#${id}`;
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+    const { title, instructions, ingredients } = await request.json();
+    const recipeId = `RECIPE#${params.id}`;
 
-    const recipe = recipes.find((r) => r.SK === recipeId);
+    try {
+        const command = new UpdateCommand({
+            TableName: TABLE_NAME,
+            Key: {
+                PK: `USER#${config.userID}`,
+                SK: recipeId,
+            },
+            UpdateExpression: `
+                SET #title = :title,
+                    #instructions = :instructions,
+                    #ingredients = :ingredients
+            `,
+            ExpressionAttributeNames: {
+                "#title": "title",
+                "#instructions": "instructions",
+                "#ingredients": "ingredients",
+            },
+            ExpressionAttributeValues: {
+                ":title": title,
+                ":instructions": instructions,
+                ":ingredients": ingredients,
+            },
+            ReturnValues: "ALL_NEW"
+        });
 
-    if (!recipe) {
-        return NextResponse.json({ message: "Recipe not found" }, { status: 404 });
+        const result = await dynamodb.send(command);
+
+        return NextResponse.json(result.Attributes);
+    } catch (error) {
+        console.error("Error updating recipe:", error);
+        return NextResponse.json({ message: "Failed to update recipe" }, { status: 500 });
     }
-
-    return NextResponse.json(recipe);
 }
